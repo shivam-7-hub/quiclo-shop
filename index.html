@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUICLO | Premium Essentials</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: #f4f4f9; margin: 0; padding-bottom: 100px; overflow-x: hidden; }
+
+        /* LOADING PAGE STYLE */
+        #loader { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #7c3aed; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; z-index: 10000; color: white; 
+        }
+        .spin { width: 50px; height: 50px; border: 5px solid #ffffff33; border-top: 5px solid white; border-radius: 50%; animation: s 1s linear infinite; }
+        @keyframes s { 100% { transform: rotate(360deg); } }
+
+        header { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 24px; font-weight: 900; color: #7c3aed; letter-spacing: -1px; }
+
+        .search-area { padding: 10px 15px; background: white; }
+        /* SEARCH WITH EMOJI */
+        #search-box { width: 100%; padding: 14px; border-radius: 15px; border: 1.5px solid #eee; background: #f9f9f9; outline: none; font-size: 16px; }
+
+        /* VIBRANT PURPLE HIGHLIGHT */
+        .purple-banner { 
+            background: #7c3aed; color: white; padding: 25px 20px; 
+            margin: 15px; border-radius: 20px; position: relative; 
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3); overflow: hidden;
+        }
+        
+        /* ROUND FREE DELIVERY BOX */
+        .free-box { 
+            display: inline-block; background: white; color: black;
+            padding: 5px 15px; border-radius: 50px;
+            font-size: 11px; font-weight: 900; margin-bottom: 10px;
+        }
+
+        .purple-banner h1 { margin: 0; font-size: 22px; font-weight: 900; line-height: 1.2; position: relative; z-index: 2; }
+        .watermark { position: absolute; right: -20px; bottom: -10px; font-size: 80px; font-weight: 900; opacity: 0.1; transform: rotate(-10deg); }
+
+        /* PRODUCT GRID */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
+        .card { background: white; border-radius: 20px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .card img { width: 100%; height: 110px; object-fit: contain; }
+        .card h4 { font-size: 14px; margin: 10px 0 5px; color: #333; height: 35px; overflow: hidden; }
+        .price-tag { font-weight: 900; font-size: 18px; color: #000; margin-bottom: 10px; }
+
+        /* PLUS MINUS COUNTER STYLE */
+        .add-btn { background: #7c3aed; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; }
+        .counter { display: none; background: #7c3aed; color: white; border-radius: 12px; justify-content: space-between; align-items: center; padding: 5px 10px; }
+        .counter button { background: none; border: none; color: white; font-size: 20px; font-weight: 900; cursor: pointer; padding: 0 10px; }
+
+        /* THANK YOU PAGE */
+        #thank-you-page { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: white; color: #7c3aed; display: none; 
+            flex-direction: column; align-items: center; justify-content: center; z-index: 10000; text-align: center;
+        }
+
+        #address-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #22c55e; color: white; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9000; padding: 20px; }
+        #address-box { width: 90%; height: 100px; border-radius: 15px; border: 2px solid white; background: rgba(255,255,255,0.2); color: white; padding: 15px; font-size: 16px; outline: none; margin: 20px 0; }
+        
+        #cart-bar { position: fixed; bottom: 20px; left: 15px; right: 15px; background: #22c55e; color: white; padding: 18px; border-radius: 20px; display: none; justify-content: space-between; align-items: center; z-index: 5000; }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <h1 style="font-size: 40px; font-weight: 900; margin-bottom: 20px;">QUICLO</h1>
+    <div class="spin"></div>
+</div>
+
+<header>
+    <div class="logo">QUICLO</div>
+    <div style="font-weight: 800;">🛒 ₹<span id="nav-total">0</span></div>
+</header>
+
+<div class="search-area">
+    <input type="text" id="search-box" onkeyup="search()" placeholder="🔍 Search from 50+ essentials...">
+</div>
+
+<div class="purple-banner">
+    <div class="free-box">FREE DELIVERY</div>
+    <h1>FASTEST DELIVERY<br>IN TOWN ⚡</h1>
+    <div class="watermark">QUICLO</div>
+</div>
+
+<div class="grid" id="product-list"></div>
+
+<div id="address-page">
+    <h1 style="font-weight: 900;">DELIVERY DETAILS</h1>
+    <textarea id="address-box" placeholder="Aapka Full Address..."></textarea>
+    <button onclick="showThankYou()" style="background: white; color: #22c55e; border: none; padding: 15px 40px; border-radius: 15px; font-weight: 900; font-size: 18px;">ORDER CONFIRM</button>
+</div>
+
+<div id="thank-you-page">
+    <div style="font-size: 100px;">🎉</div>
+    <h1 style="font-weight: 900; font-size: 40px; margin: 10px 0;">THANK YOU!</h1>
+    <p style="color: #94a3b8; font-weight: 800; letter-spacing: 1px;">ORDER CONFIRMED</p>
+</div>
+
+<audio id="ting" src="https://assets.mixkit.co/active_storage/sfx/2861/2861-preview.mp3"></audio>
+
+<div id="cart-bar">
+    <span id="cart-total-text" style="font-size: 20px; font-weight: 900;">₹0</span>
+    <button onclick="document.getElementById('address-page').style.display='flex'" style="background: white; color: #22c55e; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 900;">CHECKOUT →</button>
+</div>
+
+<script>
+const GITHUB_RAW = "https://raw.githubusercontent.com/SAKET-7-hub/quiclo-assets/main/"; 
+
+// FULL 50 ITEMS LIST
+const products = [
+    { id: 1, name: "Aashirvaad Atta", price: 245, img: "aashirvaad.jpg" },
+    { id: 2, name: "Agarbatti", price: 50, img: "agarbatti.jpg" },
+    { id: 3, name: "Amul Butter", price: 56, img: "amul butter.jpg" },
+    { id: 4, name: "Amul Lassi", price: 20, img: "amul lassi.png" },
+    { id: 5, name: "Amul Milk", price: 33, img: "amul milk.jpeg" },
+    { id: 6, name: "Amul Paneer", price: 85, img: "amul paneer.jpg" },
+    { id: 7, name: "Arhar Dal", price: 160, img: "arhar dal.jpeg" },
+    { id: 8, name: "Basmati Rice", price: 110, img: "basmati rice.jpg" },
+    { id: 9, name: "Besan", price: 65, img: "besan.jpeg" },
+    { id: 10, name: "Bingo Chips", price: 20, img: "bingo.jpg" },
+    { id: 11, name: "Bisleri 1L", price: 20, img: "bisleri.jpeg" },
+    { id: 12, name: "Bournvita", price: 195, img: "bournvita.jpeg" },
+    { id: 13, name: "Brown Bread", price: 45, img: "brown bread.png" },
+    { id: 14, name: "Coke 750ml", price: 45, img: "coke.jpg" },
+    { id: 15, name: "Colgate", price: 110, img: "colgate.jpeg" },
+    { id: 16, name: "Corn Flakes", price: 175, img: "corn flakes.jpeg" },
+    { id: 17, name: "Dahi 200g", price: 25, img: "dahi.jpg" },
+    { id: 18, name: "Dairy Milk", price: 40, img: "dairy milk.jpg" },
+    { id: 19, name: "Dettol Soap", price: 45, img: "dettol.png" },
+    { id: 20, name: "Dove Shampoo", price: 180, img: "dove shampoo.jpg" },
+    { id: 21, name: "Fortune Oil", price: 145, img: "fortune.png" },
+    { id: 22, name: "Gillette Guard", price: 25, img: "gillete guard.jpg" },
+    { id: 23, name: "Aloo Bhujia", price: 40, img: "haldiram alloo bhujia.jpeg" },
+    { id: 24, name: "Harpic Blue", price: 99, img: "harpic.jpeg" },
+    { id: 25, name: "Hide & Seek", price: 30, img: "hide seek.png" },
+    { id: 26, name: "Kissan Ketchup", price: 125, img: "kisaan ketchup.png" },
+    { id: 27, name: "Kitkat", price: 20, img: "kitkat.jpeg" },
+    { id: 28, name: "Kurkure", price: 20, img: "kurkure.png" },
+    { id: 29, name: "Lays Classic", price: 20, img: "lays classic.jpg" },
+    { id: 30, name: "Lizol 500ml", price: 105, img: "lizol.jpeg" },
+    { id: 31, name: "Maaza 600ml", price: 40, img: "maaza.png" },
+    { id: 32, name: "Maggi 12pk", price: 168, img: "maggi.jpg" },
+    { id: 33, name: "Kitchen King", price: 82, img: "mah kitchen king.png" },
+    { id: 34, name: "Maida 1kg", price: 45, img: "maida.jpg" },
+    { id: 35, name: "Oreo", price: 30, img: "oreo.jpg" },
+    { id: 36, name: "Parle-G", price: 10, img: "parle g.jpg" },
+    { id: 37, name: "Peanut Butter", price: 199, img: "peanut butter.jpeg" },
+    { id: 38, name: "Pepsi 750ml", price: 45, img: "pepsi.jpeg" },
+    { id: 39, name: "Poha 1kg", price: 65, img: "poha.jpeg" },
+    { id: 40, name: "Pooja Ghee 1L", price: 680, img: "pooja ghee.jpeg" },
+    { id: 41, name: "Rajma 1kg", price: 145, img: "rajma.jpg" },
+    { id: 42, name: "Real Juice 1L", price: 110, img: "real juice.jpeg" },
+    { id: 43, name: "Red Bull", price: 125, img: "redbull.jpeg" },
+    { id: 44, name: "Sprite 750ml", price: 45, img: "sprite.jpg" },
+    { id: 45, name: "Stayfree", price: 160, img: "stayfree.jpeg" },
+    { id: 46, name: "Sting 250ml", price: 20, img: "sting.jpg" },
+    { id: 47, name: "Sugar 1kg", price: 48, img: "sugar.jpg" },
+    { id: 48, name: "Surf Excel 1kg", price: 135, img: "surf excel.jpeg" },
+    { id: 49, name: "Tata Salt", price: 28, img: "tata salt.png" },
+    { id: 50, name: "Vim Bar", price: 10, img: "vim.jpeg" }
+];
+
+let cart = {};
+
+// LOADER LOGIC
+window.onload = () => {
+    setTimeout(() => {
+        document.getElementById('loader').style.display = 'none';
+    }, 2000);
+    render(products);
+};
+
+function render(items) {
+    const list = document.getElementById('product-list');
+    list.innerHTML = items.map(p => `
+        <div class="card">
+            <img src="${GITHUB_RAW + p.img}" onerror="this.src='https://via.placeholder.com/100?text=${p.name}'">
+            <h4>${p.name}</h4>
+            <div class="price-tag">₹${p.price}</div>
+            <button id="add-btn-${p.id}" class="add-btn" onclick="updateCount(${p.id}, 1)">ADD</button>
+            <div id="counter-${p.id}" class="counter">
+                <button onclick="updateCount(${p.id}, -1)">−</button>
+                <span id="qty-${p.id}">0</span>
+                <button onclick="updateCount(${p.id}, 1)">+</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// PLUS MINUS LOGIC
+function updateCount(id, delta) {
+    cart[id] = (cart[id] || 0) + delta;
+    if(cart[id] < 0) cart[id] = 0;
+
+    const btn = document.getElementById(`add-btn-${id}`);
+    const ctr = document.getElementById(`counter-${id}`);
+    const qtyText = document.getElementById(`qty-${id}`);
+
+    if(cart[id] > 0) {
+        btn.style.display = 'none';
+        ctr.style.display = 'flex';
+        qtyText.innerText = cart[id];
+    } else {
+        btn.style.display = 'block';
+        ctr.style.display = 'none';
+    }
+    updateCartUI();
+}
+
+function updateCartUI() {
+    let total = 0;
+    for(let id in cart) { total += products.find(p => p.id == id).price * cart[id]; }
+    document.getElementById('nav-total').innerText = total;
+    document.getElementById('cart-total-text').innerText = '₹' + total;
+    document.getElementById('cart-bar').style.display = total > 0 ? 'flex' : 'none';
+}
+
+function search() {
+    const q = document.getElementById('search-box').value.toLowerCase().replace('🔍 ', '');
+    render(products.filter(p => p.name.toLowerCase().includes(q)));
+}
+
+function showThankYou() {
+    const addr = document.getElementById('address-box').value;
+    if(!addr) { alert("Address enter karein!"); return; }
+    document.getElementById('ting').play();
+    document.getElementById('address-page').style.display = 'none';
+    document.getElementById('thank-you-page').style.display = 'flex';
+
+    let msg = "*QUICLO NEW ORDER*\n\n";
+    for(let id in cart) {
+        if(cart[id] > 0) {
+            let p = products.find(x => x.id == id);
+            msg += `• ${p.name} x ${cart[id]}\n`;
+        }
+    }
+    msg += `\n📍 *Address:* ${addr}`;
+    setTimeout(() => { window.location.href = `https://wa.me/918708719638?text=${encodeURIComponent(msg)}`; }, 2500);
+}
+</script>
+</body>
+</html>
+
